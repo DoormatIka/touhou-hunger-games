@@ -10,3 +10,5 @@ Planned features for a **Beta Release**:
   - Fighting other players, of course.
   - Events whenever someone dies.
   - 10 players is the limit.
+  - Will be played via CLI.
+    - The website will be hosted on an alpha release.
