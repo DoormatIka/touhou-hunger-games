@@ -1,4 +1,4 @@
-import { Player, compareFightingChance } from "./player";
+import { Player, compareFightingChance } from "../player";
 import { 
   createGraph, 
   moveTo, 
@@ -7,7 +7,7 @@ import {
   shallowMarkPlayers,
   getPlayersLength,
   getAreaLength,
-} from "./area";
+} from "../area";
 
 const hv_objects = [
   "Road", 
@@ -42,15 +42,15 @@ for (let i = 0; i < 5000; i++) {
 }
 adj_list.get("Road")?.players.push(...players)
 
-
-
-
+const shallowmarktime = []
+const shallowmovetime = []
 const len = 15;
 
 for (let i = 0; i < len; i++) {
   console.log(`Player count: ${getPlayersLength(adj_list)}`);
   console.log(`Area length: ${getAreaLength(adj_list)}`);
 
+  const shallow_move_prevt = performance.now()
   for (let i = 0; i < players.length; i++) { // MOVING PHASE
     const paths = shallowReturnRelatedPathsofPlayer(adj_list, `p${i}`);
     if (paths && paths.related) {
@@ -61,10 +61,17 @@ for (let i = 0; i < len; i++) {
       }
     }
   }
+  const shallow_move_currt = performance.now()
+  shallowmovetime.push(shallow_move_currt - shallow_move_prevt)
 
+  const shallow_prevt = performance.now()
   for (let j = 0; j <= 15; j++) {
     if (j > 3) {
       shallowMarkPlayers(adj_list);
     }
   }
+  const shallow_currt = performance.now()
+  shallowmarktime.push(shallow_currt - shallow_prevt)
 }
+console.log(`Average Shallow Mark: ${shallowmarktime.reduce((prev, curr) => { return curr + prev }) / shallowmarktime.length}ms`)
+console.log(`Average Shallow Move: ${shallowmovetime.reduce((prev, curr) => { return curr + prev }) / shallowmovetime.length}ms`)

@@ -82,11 +82,11 @@ export function traverseBFSGraph(
   }
 }
 
-export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: Area) => void) {
+export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: Area, current: string) => void) {
   for (const key of adj_list.keys()) {
     const area = adj_list.get(key);
     if (area) {
-      func(area);
+      func(area, key);
     }
   }
 }
@@ -165,6 +165,18 @@ export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_
   return payload;
 }
 
+export function shallowReturnRelatedPathsofPlayer(adj_list: Map<string, Area>, playerId: string) {
+  let payload: { now: string, related: string[] | undefined } = { now: "", related: [] }
+  shallowTraverseGraph(adj_list, (area, curr) => {
+    for (const player of area.players) {
+      if (player.id === playerId) {
+        payload = { now: curr, related: area.to }
+        break;
+      }
+    }
+  })
+  return payload;
+}
 
 /**
  * Mark players to be killed.
