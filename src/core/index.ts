@@ -1,13 +1,13 @@
-import { Player, compareFightingChance } from "./player";
+import { Player } from "./player";
 import { 
   createGraph, 
   moveTo, 
-  returnRelatedPathsofPlayer, 
   shallowReturnRelatedPathsofPlayer,
   shallowMarkPlayers,
   getPlayersLength,
   getAreaLength,
 } from "./area";
+
 
 const hv_objects = [
   "Road", 
@@ -15,56 +15,44 @@ const hv_objects = [
   "House 2",
   "House 3",
   "House 4",
-  "House 5",
-  "House 6"
 ];
 const hv_routes = [
-  ["House 1", "Road"],
-  ["House 2", "Road"],
+  ["House 1", "Road"], ["House 1", "House 2"],
+  ["House 2", "Road"], ["House 2", "House 3"],
   ["House 3", "Road"],
   ["House 4", "Road"],
-  ["House 5", "Road"],
-  ["House 6", "Road"],
 ];
 
-for (let i = 6; i < 1000; i++) {
-  hv_objects.push(`House ${i}`);
-  hv_routes.push([`House ${i}`, "Road"]);
-}
 
 const adj_list = createGraph(hv_objects, hv_routes)
 const players = [];
 
-for (let i = 0; i < 5000; i++) {
-  const pal = new Player(`p${i}`);
-  pal.currentArea = "Road"
-  players.push(pal);
+for (let i = 0; i < 15; i++) {
+  const player = new Player(`p${i}`);
+  player.currentArea = "Road"
+  players.push(player);
 }
 adj_list.get("Road")?.players.push(...players)
 
 
 
+let j = 0;
 
-const len = 15;
-
-for (let i = 0; i < len; i++) {
-  console.log(`Player count: ${getPlayersLength(adj_list)}`);
-  console.log(`Area length: ${getAreaLength(adj_list)}`);
-
+console.log(`Area length: ${getAreaLength(adj_list)}`);
+while (getPlayersLength(adj_list) > 1) {
   for (let i = 0; i < players.length; i++) { // MOVING PHASE
     const paths = shallowReturnRelatedPathsofPlayer(adj_list, `p${i}`);
     if (paths && paths.related) {
       const random_choice = Math.floor(Math.random() * paths.related.length);
       const moved = moveTo(paths.now, paths.related[random_choice], `p${i}`, adj_list);
       if (moved) {
-        // console.log(`Moved ${moved.playerId} to ${moved.new_path} from ${moved.start}`)
+        console.log(`Moved p${i} to ${moved} from ${paths.now}`);
       }
     }
   }
 
-  for (let j = 0; j <= 15; j++) {
-    if (j > 3) {
-      shallowMarkPlayers(adj_list);
-    }
-  }
+  shallowMarkPlayers(adj_list, (killed, alive) => {
+    console.log(`${killed.id} has been killed by ${alive.id}`);
+  });
+  j++;
 }

@@ -10,25 +10,9 @@ export class Player {
   getFightingChance() {
     return this.fighting_chance
   }
-  kill() {
+  kill() { // random events whenever someone dies
     this.isAlive = false;
   }
-}
-
-/**
- * @param player1 - Player object
- * @param player2 - Player object
- * @returns - individual chances for players
- */
-export function compareFightingChance(player1: Player, player2: Player) {
-  const p2_chance = player2.generateFightingChance()
-  const p1_chance = player1.generateFightingChance()
-  const if_player1_wins = p1_chance > p2_chance;
-  
-  player1.isAlive = if_player1_wins;
-  player2.isAlive = !if_player1_wins;
-  
-  return { p1_chance, p2_chance };
 }
 
 // random action picker to send random events like in the original hunger games

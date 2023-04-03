@@ -23,7 +23,12 @@ function addNode(name: string, adj: Map<string, Area>) {
 }
 
 // PLAYER FUNCTIONS
-export function moveTo(start: string, search: string, playerId: string, adj_list: Map<string, Area>) {
+export function moveTo(
+  start: string, 
+  search: string, 
+  playerId: string, 
+  adj_list: Map<string, Area>
+) {
   const upper_path = adj_list.get(start) // gets the edges of the vertex
   if (!upper_path) return;
 
@@ -40,10 +45,11 @@ export function moveTo(start: string, search: string, playerId: string, adj_list
       nested_path?.players.push(playerToMove);
       playerToMove.currentArea = nested_path_string;
 
-      return { playerId, new_path: nested_path_string, start };
+      return nested_path_string;
     }
   }
 }
+
 function splicePlayerfromPath(upper_path: Area, playerId: string) {
   const index = upper_path.players.findIndex(v => v.id === playerId);
   if (index === -1) return;
@@ -91,17 +97,17 @@ export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: A
   }
 }
 
-export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (ahead: Area[]) => void) {
-  const to = adj_list.get(key)?.to;
-  if (to) {
-    const objects = to.map(v => adj_list.get(v)!)
-    func(objects)
+export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (area: Area) => void) {
+  const curr_area = adj_list.get(key);
+  if (curr_area) {
+    func(curr_area)
   }
 }
 
 /**
- * Does a shallow traversal of the graph.
+ * Returns the number of players.
  * 
+ * Does a shallow traversal of the graph.
  * Shallow: Disregards ordering for speed.
  * @param adj_list - the adjacent list
  * @returns number of players
@@ -117,14 +123,20 @@ export function getPlayersLength(
   }
   return i;
 }
-
+/**
+ * Returns the number of areas.
+ * 
+ * Does a shallow traversal of the graph.
+ * @param adj_list - the adjacent list
+ * @returns number of areas
+ */
 export function getAreaLength(
   adj_list: Map<string, Area>,
 ) {
   return [...adj_list.keys()].length;
 }
 
-export function shallowMarkPlayers(adj_list: Map<string, Area>) {
+export function shallowMarkPlayers(adj_list: Map<string, Area>, onKill?: (killed_player: Player, alive_player: Player) => void) {
   shallowTraverseGraph(adj_list, (area) => {
     if (area.players.length == 0) return;
 
@@ -136,33 +148,12 @@ export function shallowMarkPlayers(adj_list: Map<string, Area>) {
 
       if (prev.getFightingChance() < curr.getFightingChance()) {
         curr.kill()
+        if (onKill)
+          onKill(curr, prev);
       }
       return curr;
     })
   })
-}
-
-/**
- * 
- * @param start - What Area ID to start
- * @param playerId - What PlayerID to find
- * @param adj_list - the Adjacency List used to represent the graph
- * @returns An Array of Area IDs related to the player ID
- */
-export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_list: Map<string, Area>) {
-  let payload: { now: string, related: string[] | undefined } = { 
-    now: "",
-    related: []
-  }
-  traverseBFSGraph(start, adj_list, (_, current, area) => {
-    for (const player of area.players) {
-      if (player.id === playerId) {
-        payload = { now: current, related: adj_list.get(current)?.to }
-        break;
-      }
-    }
-  })
-  return payload;
 }
 
 export function shallowReturnRelatedPathsofPlayer(adj_list: Map<string, Area>, playerId: string) {
@@ -177,6 +168,7 @@ export function shallowReturnRelatedPathsofPlayer(adj_list: Map<string, Area>, p
   })
   return payload;
 }
+
 
 /**
  * Mark players to be killed.
@@ -199,4 +191,27 @@ export function markPlayers(start: string, adj_list: Map<string, Area>) {
       return curr;
     })
   })
+}
+
+/**
+ * DEPRECATED FOR shallowReturnRelatedPathsofPlayer
+ * @param start - What Area ID to start
+ * @param playerId - What PlayerID to find
+ * @param adj_list - the Adjacency List used to represent the graph
+ * @returns An Array of Area IDs related to the player ID
+ */
+export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_list: Map<string, Area>) {
+  let payload: { now: string, related: string[] | undefined } = { 
+    now: "",
+    related: []
+  }
+  traverseBFSGraph(start, adj_list, (_, current, area) => {
+    for (const player of area.players) {
+      if (player.id === playerId) {
+        payload = { now: current, related: adj_list.get(current)?.to }
+        break;
+      }
+    }
+  })
+  return payload;
 }
