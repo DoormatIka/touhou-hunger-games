@@ -1,4 +1,4 @@
-import { Player, compareFightingChance } from "../player";
+import { Player } from "../core/player";
 import { 
   createGraph, 
   moveTo, 
@@ -7,7 +7,7 @@ import {
   shallowMarkPlayers,
   getPlayersLength,
   getAreaLength,
-} from "../area";
+} from "../core/area";
 
 const hv_objects = [
   "Road", 
