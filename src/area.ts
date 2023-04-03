@@ -91,6 +91,14 @@ export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: A
   }
 }
 
+export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (ahead: Area[]) => void) {
+  const to = adj_list.get(key)?.to;
+  if (to) {
+    const objects = to.map(v => adj_list.get(v)!)
+    func(objects)
+  }
+}
+
 /**
  * Does a shallow traversal of the graph.
  * 
@@ -146,7 +154,7 @@ export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_
     now: "",
     related: []
   }
-  traverseBFSGraph(start, adj_list, (ahead, current, area) => {
+  traverseBFSGraph(start, adj_list, (_, current, area) => {
     for (const player of area.players) {
       if (player.id === playerId) {
         payload = { now: current, related: adj_list.get(current)?.to }
@@ -164,7 +172,7 @@ export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_
  * DEPRECATED FOR shallowMarkPlayers
  */
 export function markPlayers(start: string, adj_list: Map<string, Area>) {
-  traverseBFSGraph(start, adj_list, (ahead, current, area) => {
+  traverseBFSGraph(start, adj_list, (_, __, area) => {
     if (area.players.length == 0) return;
 
     area.players.reduce((prev, curr) => {
