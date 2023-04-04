@@ -1,4 +1,5 @@
-import { Player } from "./player"
+import { Player } from "./player.js"
+import { splicePlayerfromPath } from "./actions/move.js";
 
 export class Area {
   public players: Player[] = []
@@ -22,41 +23,62 @@ function addNode(name: string, adj: Map<string, Area>) {
   adj.set(name, new Area())
 }
 
-// PLAYER FUNCTIONS
-export function moveTo(
-  start: string, 
-  search: string, 
-  playerId: string, 
-  adj_list: Map<string, Area>
-) {
-  const upper_path = adj_list.get(start) // gets the edges of the vertex
-  if (!upper_path) return;
 
-  const playerToMove = splicePlayerfromPath(upper_path, playerId);
-  if (!playerToMove) return;
-
-  // if they're dead, don't add them back into the graph
-  // the sweep part of the mark & sweep process
-  if (!playerToMove.isAlive) return;
-
-  for (const nested_path_string of upper_path.to) {
-    if (nested_path_string === search) {
-      const nested_path = adj_list.get(nested_path_string);
-      nested_path?.players.push(playerToMove);
-      playerToMove.currentArea = nested_path_string;
-
-      return nested_path_string;
+export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: Area, current: string) => void) {
+  for (const key of adj_list.keys()) {
+    const area = adj_list.get(key);
+    if (area) {
+      func(area, key);
     }
   }
 }
 
-function splicePlayerfromPath(upper_path: Area, playerId: string) {
-  const index = upper_path.players.findIndex(v => v.id === playerId);
-  if (index === -1) return;
-
-  return upper_path.players.splice(index, 1)[0];
+export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (area: Area) => void) {
+  const curr_area = adj_list.get(key);
+  if (curr_area) {
+    func(curr_area)
+  }
 }
 
+/**
+ * Returns the number of areas.
+ * 
+ * Does a shallow traversal of the graph.
+ * @param adj_list - the adjacent list
+ * @returns number of areas
+ */
+export function getAreaLength(
+  adj_list: Map<string, Area>,
+) {
+  return [...adj_list.keys()].length;
+}
+
+/**
+ * Returns the number of players.
+ * 
+ * Does a shallow traversal of the graph.
+ * Shallow: Disregards ordering for speed.
+ * @param adj_list - the adjacent list
+ * @returns number of players
+ */
+export function getPlayersLength(
+  adj_list: Map<string, Area>,
+) {
+  let i = 0;
+  const keys = [...adj_list.keys()];
+  for (const key of keys) {
+    const area = adj_list.get(key);
+    i += area?.players.length ?? 0;
+  }
+  return i;
+}
+
+
+
+
+
+
+///// DEPTH FIRST SEARCH TRAVERSAL ///////
 /**
  * Does a Depth-First Search traversal of the graph. Deep traversal.
  * @param start - What ID to start the traversal
@@ -87,88 +109,6 @@ export function traverseBFSGraph(
     }
   }
 }
-
-export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: Area, current: string) => void) {
-  for (const key of adj_list.keys()) {
-    const area = adj_list.get(key);
-    if (area) {
-      func(area, key);
-    }
-  }
-}
-
-export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (area: Area) => void) {
-  const curr_area = adj_list.get(key);
-  if (curr_area) {
-    func(curr_area)
-  }
-}
-
-/**
- * Returns the number of players.
- * 
- * Does a shallow traversal of the graph.
- * Shallow: Disregards ordering for speed.
- * @param adj_list - the adjacent list
- * @returns number of players
- */
-export function getPlayersLength(
-  adj_list: Map<string, Area>,
-) {
-  let i = 0;
-  const keys = [...adj_list.keys()];
-  for (const key of keys) {
-    const area = adj_list.get(key);
-    i += area?.players.length ?? 0;
-  }
-  return i;
-}
-/**
- * Returns the number of areas.
- * 
- * Does a shallow traversal of the graph.
- * @param adj_list - the adjacent list
- * @returns number of areas
- */
-export function getAreaLength(
-  adj_list: Map<string, Area>,
-) {
-  return [...adj_list.keys()].length;
-}
-
-export function shallowMarkPlayers(adj_list: Map<string, Area>, onKill?: (killed_player: Player, alive_player: Player) => void) {
-  shallowTraverseGraph(adj_list, (area) => {
-    if (area.players.length == 0) return;
-
-    area.players.reduce((prev, curr) => {
-      if (!prev.isAlive || !curr.isAlive) return curr;
-
-      prev.generateFightingChance()
-      curr.generateFightingChance()
-
-      if (prev.getFightingChance() < curr.getFightingChance()) {
-        curr.kill()
-        if (onKill)
-          onKill(curr, prev);
-      }
-      return curr;
-    })
-  })
-}
-
-export function shallowReturnRelatedPathsofPlayer(adj_list: Map<string, Area>, playerId: string) {
-  let payload: { now: string, related: string[] | undefined } = { now: "", related: [] }
-  shallowTraverseGraph(adj_list, (area, curr) => {
-    for (const player of area.players) {
-      if (player.id === playerId) {
-        payload = { now: curr, related: area.to }
-        break;
-      }
-    }
-  })
-  return payload;
-}
-
 
 /**
  * Mark players to be killed.
@@ -214,4 +154,34 @@ export function returnRelatedPathsofPlayer(start: string, playerId: string, adj_
     }
   })
   return payload;
+}
+
+export function deepMoveTo(
+  start: string, 
+  search: string, 
+  playerId: string, 
+  adj_list: Map<string, Area>
+) {
+
+  const upper_path = adj_list.get(start) // gets the edges of the vertex
+  if (!upper_path) return;
+
+  const playerToMove = splicePlayerfromPath(upper_path, playerId);
+  if (!playerToMove) return;
+
+  // if they're dead, don't add them back into the graph
+  // the sweep part of the mark & sweep process
+  if (!playerToMove.isAlive) return;
+
+
+  for (const nested_path_string of upper_path.to) {
+    if (nested_path_string === search) {
+      const nested_area = adj_list.get(nested_path_string);
+
+      nested_area?.players.push(playerToMove);
+      playerToMove.currentArea = nested_path_string;
+
+      return nested_path_string;
+    }
+  }
 }
