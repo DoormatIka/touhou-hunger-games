@@ -1,11 +1,12 @@
 import chalk from "chalk";
-import { Player } from "./core/player.js";
+import { generateRandomNumber, Player } from "./core/player.js";
 import {
   createGraph,
   getPlayersLength,
   shallowTraverseGraph
 } from "./core/area.js";
 import { markPlayers, sweepPlayer } from "./core/actions/mark.js";
+import {batchMoveTo} from "./core/actions/move.js";
 
 const hv_objects = [
   "Road",
@@ -24,7 +25,7 @@ const hv_routes = [
 const adj_list = createGraph(hv_objects, hv_routes)
 const road = adj_list.get("Road")!
 
-const playerLen = 10;
+const playerLen = 5;
 for (let i = 0; i < playerLen; i++) {
   const player = new Player(`p${i}`);
   player.currentArea = "Road";
@@ -37,10 +38,22 @@ console.log(chalk.bgGray(chalk.bold(`Move 1`)))
 console.log(`${getPlayersLength(adj_list)} players left.`)
 
 shallowTraverseGraph(adj_list, (area, current) => {
-  if (area.players.length == 0) return;
 
-  for (const player of area.players) {
-    
+  console.log(`Checking location "${current}" for players.`)
+  console.log(`Players have: ${area.players.length}`)
+  
+  // keeps skipping odd ids for some reason
+  for (let i = 0; i < area.players.length; i++) {
+    const currPlayer = area.players[i]
+    if (currPlayer.hasMoved) continue;
+    console.log(`${currPlayer.id}'s turn: ${i}`)
+
+    const ran = generateRandomNumber(area.to.length - 1);
+    const chosenArea = adj_list.get(area.to[ran])!
+
+    currPlayer.hasMoved = true;
+    console.log(`${area.to[ran]} area chosen by ${currPlayer.id} from ${current}`)
+    chosenArea.players.push(area.players.splice(i, 1)[0]);
   }
 
   /*
@@ -56,3 +69,4 @@ shallowTraverseGraph(adj_list, (area, current) => {
 })
 
 console.log(`${getPlayersLength(adj_list)} players left.`)
+console.dir(adj_list, {depth: null})

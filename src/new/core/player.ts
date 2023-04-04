@@ -37,7 +37,7 @@ export class Player {
  * inclusive to limit
  * @param limit - [0-limit]
  */
-function generateRandomNumber(limit: number) {
+export function generateRandomNumber(limit: number) {
   return Math.floor(Math.random() * (limit + 1))
 }
 
