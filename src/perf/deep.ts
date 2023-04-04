@@ -1,12 +1,12 @@
-import { Player } from "../core/player";
+import { Player } from "../core/player.js";
 import { 
   createGraph, 
-  moveTo, 
+  deepMoveTo, 
   returnRelatedPathsofPlayer, 
   markPlayers,
   getPlayersLength,
   getAreaLength,
-} from "../core/area";
+} from "../core/area.js";
 
 const hv_objects = [
   "Road", 
@@ -32,46 +32,43 @@ for (let i = 6; i < 1000; i++) {
 }
 
 const adj_list = createGraph(hv_objects, hv_routes)
-const players = [];
-
-for (let i = 0; i < 5000; i++) {
-  const pal = new Player(`p${i}`);
-  pal.currentArea = "Road"
-  players.push(pal);
-}
-adj_list.get("Road")?.players.push(...players)
 
 
-const deepmarktime = [];
-const deepmovetime = [];
-const len = 15;
+for (let i = 1; i < 4; i++) {
+  const players = [];
+  for (let i = 0; i < 5000; i++) {
+    const pal = new Player(`p${i}`);
+    pal.currentArea = "Road"
+    players.push(pal);
+  }
+  adj_list.get("Road")?.players.push(...players)
 
-for (let i = 0; i < len; i++) {
-  console.log(`Player count: ${getPlayersLength(adj_list)}`);
-  console.log(`Area length: ${getAreaLength(adj_list)}`);
 
-  const deep_move_prevt = performance.now()
-  for (let i = 0; i < players.length; i++) { // MOVING PHASE
-    const paths = returnRelatedPathsofPlayer("Road", `p${i}`, adj_list);
-    if (paths && paths.related) {
-      const random_choice = Math.floor(Math.random() * paths.related.length);
-      const moved = moveTo(paths.now, paths.related[random_choice], `p${i}`, adj_list);
-      if (moved) {
-        // console.log(`Moved ${moved.playerId} to ${moved.new_path} from ${moved.start}`)
+  const len = 15 * i;
+
+  const prev = performance.now()
+  for (let i = 0; i < len; i++) {
+    const playerLen = getPlayersLength(adj_list)
+    // console.log(`Player count: ${}`);
+    // console.log(`Area length: ${getAreaLength(adj_list)}`);
+
+    for (let i = 0; i < players.length; i++) { // MOVING PHASE
+      const paths = returnRelatedPathsofPlayer("Road", `p${i}`, adj_list);
+      if (paths && paths.related) {
+        const random_choice = Math.floor(Math.random() * paths.related.length);
+        const moved = deepMoveTo(paths.now, paths.related[random_choice], `p${i}`, adj_list);
+        if (moved) {
+          // console.log(`Moved ${moved.playerId} to ${moved.new_path} from ${moved.start}`)
+        }
+      }
+    }
+
+    for (let j = 0; j <= 15; j++) {
+      if (j > 3) {
+        markPlayers("Road", adj_list);
       }
     }
   }
-  const deep_move_currt = performance.now()
-  deepmovetime.push(deep_move_currt - deep_move_prevt)
-
-  const deep_prevt = performance.now()
-  for (let j = 0; j <= 15; j++) {
-    if (j > 3) {
-      markPlayers("Road", adj_list);
-    }
-  }
-  const deep_currt = performance.now()
-  deepmarktime.push(deep_currt - deep_prevt)
+  const next = performance.now()
+  console.log(`Deep: Ran for ${next - prev}ms on ${len} iterations.`)
 }
-console.log(`Average Deep Mark: ${deepmarktime.reduce((prev, curr) => { return curr + prev }) / deepmarktime.length}ms`)
-console.log(`Average Deep Move: ${deepmovetime.reduce((prev, curr) => { return curr + prev }) / deepmarktime.length}ms`)

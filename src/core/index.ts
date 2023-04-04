@@ -1,17 +1,16 @@
-import { Player } from "./player";
-import { 
-  createGraph, 
-  moveTo, 
-  shallowReturnRelatedPathsofPlayer,
-  shallowMarkPlayers,
+import chalk from "chalk";
+import { Player } from "./player.js";
+import {
+  createGraph,
   getPlayersLength,
-  getAreaLength,
-} from "./area";
+} from "./area.js";
+import { shallowMarkPlayers, shallowSweepPlayers } from "./actions/mark.js";
+import { moveRandom } from "./actions/move.js";
 
 
 const hv_objects = [
-  "Road", 
-  "House 1", 
+  "Road",
+  "House 1",
   "House 2",
   "House 3",
   "House 4",
@@ -23,36 +22,36 @@ const hv_routes = [
   ["House 4", "Road"],
 ];
 
-
 const adj_list = createGraph(hv_objects, hv_routes)
-const players = [];
+const road = adj_list.get("Road")!
 
-for (let i = 0; i < 15; i++) {
+const playerLen = 50;
+for (let i = 0; i < playerLen; i++) {
   const player = new Player(`p${i}`);
-  player.currentArea = "Road"
-  players.push(player);
+  player.currentArea = "Road";
+  road.players.push(player);
 }
-adj_list.get("Road")?.players.push(...players)
 
-
+const map = new Map()
 
 let j = 0;
+const len = 15;
 
-console.log(`Area length: ${getAreaLength(adj_list)}`);
-while (getPlayersLength(adj_list) > 1) {
-  for (let i = 0; i < players.length; i++) { // MOVING PHASE
-    const paths = shallowReturnRelatedPathsofPlayer(adj_list, `p${i}`);
-    if (paths && paths.related) {
-      const random_choice = Math.floor(Math.random() * paths.related.length);
-      const moved = moveTo(paths.now, paths.related[random_choice], `p${i}`, adj_list);
-      if (moved) {
-        console.log(`Moved p${i} to ${moved} from ${paths.now}`);
-      }
+for (let i = 0; i < len; i++) {
+  console.log("\n")
+  console.log( chalk.bgGray(chalk.bold(`Move ${j+1}`)) )
+  console.log(`${getPlayersLength(adj_list)} players left.`)
+
+  for (let i = 0; i < playerLen; i++) { // MOVING PHASE
+    const moved = moveRandom(`p${i}`, adj_list)
+    if (moved) {
+      console.log(`${chalk.bgGray("MOVE")}: Moved p${i} to ${moved.from} from ${moved.to}`);
     }
   }
-
   shallowMarkPlayers(adj_list, (killed, alive) => {
-    console.log(`${killed.id} has been killed by ${alive.id}`);
+    console.log(`${chalk.bgRedBright("KILL:")} ${killed.id} has been killed by ${alive.id}.`);
   });
+  shallowSweepPlayers(adj_list);
+
   j++;
 }
