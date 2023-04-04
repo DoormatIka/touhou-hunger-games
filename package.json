@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fast": "tsc && node ./build/index.js",
-    "run": "node ./build/index.js"
+    "noderun": "tsc && node ./build/core/index.js",
+    "b": "bun run ./src/core/index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +14,7 @@
     "@types/node": "^18.15.11"
   },
   "dependencies": {
-    "reblessed": "^0.2.1"
-  }
+    "chalk": "^5.2.0"
+  },
+  "type": "module"
 }
