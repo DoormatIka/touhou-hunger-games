@@ -1,5 +1,13 @@
 import { shallowTraverseGraph, Area } from "../area.js";
 
+export function batchMoveTo(adj_list: Map<string, Area>) {
+  shallowTraverseGraph(adj_list, (area, current) => {
+    for (const player of area.players) {
+      player
+    }
+  })
+}
+
 /**
  * Handles the movement of the player.
  * @param start - the current place of the player
@@ -14,17 +22,11 @@ export function moveTo(
   playerId: string, 
   adj_list: Map<string, Area>
 ) {
-
   const upper_path = adj_list.get(start) // gets the edges of the vertex
   if (!upper_path) return;
 
   const playerToMove = splicePlayerfromPath(upper_path, playerId);
   if (!playerToMove) return;
-
-  // if they're dead, don't add them back into the graph
-  // the sweep part of the mark & sweep process
-  // if (!playerToMove.isAlive) return;
-
 
   for (const nested_path_string of upper_path.to) {
     if (nested_path_string === search) {
