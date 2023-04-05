@@ -1,7 +1,8 @@
 
+
 export class Player {
   public isAlive = true;
-  public hasMoved = false;
+  public hasPlayed = false;
   public currentArea = "";
   public foughtWith = "";
 
@@ -14,10 +15,15 @@ export class Player {
   constructor(
     public id: string, 
     private fighting_chance_limit: number = 100,
-  ) {}
+    private move_chance_half: number = 50
+  ) {
+    if (move_chance_half > 100) {
+      throw Error(`${this.id} has a move_chance_half higher than 100!`)
+    }
+  }
 
-  generateActionChances() {
-    this.action_chance.fight = generateRandomNumber(100);
+  generateMoveChances() {
+    this.action_chance.move  = generateRandomNumber(100);
   }
   generateFightingChance() {
     this.fighting_chance = generateRandomNumber(this.fighting_chance_limit);
@@ -25,8 +31,8 @@ export class Player {
   getFightingChance() {
     return this.fighting_chance;
   }
-  getActionChance() {
-    return this.action_chance;
+  getMoveChance() {
+    return { chance: this.action_chance.move, half: this.move_chance_half };
   }
   kill() { // random events whenever someone dies
     this.isAlive = false;
