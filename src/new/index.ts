@@ -29,7 +29,8 @@ console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 console.log(chalk.green(`${getPlayersLength(human_village)} players fighting.`))
 
 const prev = performance.now()
-main(human_village)
+console.dir(human_village, { depth: 0 })
+// main(human_village)
 const curr = performance.now()
 
 console.log(`${chalk.bgGreen(chalk.black(`Performance`))}: ${curr-prev}ms taken.`)
