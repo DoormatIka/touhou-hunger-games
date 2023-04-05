@@ -34,11 +34,11 @@ export class Player {
 }
 
 /**
- * inclusive to limit
- * @param limit - [0-limit]
+ * exclusive to limit
+ * @param limit - [0-limit)
  */
 export function generateRandomNumber(limit: number) {
-  return Math.floor(Math.random() * (limit + 1))
+  return Math.floor(Math.random() * limit)
 }
 
 // random action picker to send random events like in the original hunger games

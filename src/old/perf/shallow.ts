@@ -28,11 +28,9 @@ for (let i = 5; i < 1000; i++) {
   hv_routes.push([`House ${i}`, "Road"])
 }
 
-const adj_list = createGraph(hv_objects, hv_routes)
-const road = adj_list.get("Road")!
-
-
 for (let i = 1; i < 4; i++) {
+  const adj_list = createGraph(hv_objects, hv_routes)
+  const road = adj_list.get("Road")!
   const players = [];
   for (let i = 0; i < 5000; i++) {
     const player = new Player(`p${i}`);
@@ -45,16 +43,10 @@ for (let i = 1; i < 4; i++) {
   let j = 0;
 
   console.log(`Area length: ${getAreaLength(adj_list)} | Player length: ${getPlayersLength(adj_list)}`);
-  // getPlayersLength(adj_list) > 1 while
   const len = 15 * i;
 
   const prev = performance.now()
   for (let i = 0; i < len; i++) {
-    const playerLen = getPlayersLength(adj_list);
-
-    // console.log( chalk.bgGray(chalk.bold(`Move ${j+1}`)) )
-    // console.log(`${playerLen} players left.`)
-
     for (let i = 0; i < players.length; i++) { // MOVING PHASE
       const moved = moveRandom(`p${i}`, adj_list)
       if (moved) {
