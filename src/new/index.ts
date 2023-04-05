@@ -67,4 +67,5 @@ function main(adj_list: Map<string, Area>) {
   }
 
   console.log(chalk.green(`${getPlayersLength(adj_list)} players left.`))
+  console.log(`Developed by ${chalk.bgBlack(`${chalk.blueBright("7")} ${chalk.yellowBright("Colors")} ${chalk.redBright("Alice")}`)}.`)
 }
