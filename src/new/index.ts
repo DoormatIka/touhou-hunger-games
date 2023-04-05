@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { generateRandomNumber, Player } from "./core/player.js";
 import {
+  Area,
   createGraph,
   getPlayersLength,
   shallowTraverseGraph
@@ -12,14 +13,10 @@ const hv_objects = [
   "Road",
   "House 1",
   "House 2",
-  "House 3",
-  "House 4",
 ];
 const hv_routes = [
-  ["House 1", "Road"], ["House 1", "House 2"],
-  ["House 2", "Road"], ["House 2", "House 3"],
-  ["House 3", "Road"],
-  ["House 4", "Road"],
+  ["House 1", "Road"],
+  ["House 2", "Road"],
 ];
 
 const adj_list = createGraph(hv_objects, hv_routes)
@@ -34,39 +31,71 @@ for (let i = 0; i < playerLen; i++) {
 
 const map = new Map()
 
-console.log(chalk.bgGray(chalk.bold(`Move 1`)))
+
 console.log(`${getPlayersLength(adj_list)} players left.`)
 
-shallowTraverseGraph(adj_list, (area, current) => {
+main()
 
-  console.log(`Checking location "${current}" for players.`)
-  console.log(`Players have: ${area.players.length}`)
+function main() {
+  for (let i = 0; i < 1; i++) {
+    console.log(chalk.bgGray(chalk.bold(`Move ${i}`)))
+    shallowTraverseGraph(adj_list, (area, current) => {
   
-  // keeps skipping odd ids for some reason
-  for (let i = 0; i < area.players.length; i++) {
-    const currPlayer = area.players[i]
-    if (currPlayer.hasMoved) continue;
-    console.log(`${currPlayer.id}'s turn: ${i}`)
-
-    const ran = generateRandomNumber(area.to.length - 1);
-    const chosenArea = adj_list.get(area.to[ran])!
-
-    currPlayer.hasMoved = true;
-    console.log(`${area.to[ran]} area chosen by ${currPlayer.id} from ${current}`)
-    chosenArea.players.push(area.players.splice(i, 1)[0]);
+      console.log(`Checking location "${current}" for players.`)
+      
+      console.log(area.players)
+      moveTo(area, current);
+      
+      // console.dir(area.players, { depth: 0 })
+  
+      // keeps skipping odd ids for some reason
+      /*
+      for (let i = 0; i < area.players.length; i++) {
+        const currPlayer = area.players[i]
+        console.log(`${currPlayer.id}'s turn: ${i}`)
+  
+        if (currPlayer.hasMoved) 
+          continue;
+        const ran = generateRandomNumber(area.to.length - 1);
+        const chosenArea = adj_list.get(area.to[ran])!
+  
+        currPlayer.hasMoved = true;
+        console.log(`${area.to[ran]} area chosen by ${currPlayer.id} from ${current}`)
+        chosenArea.players.push(area.players.splice(i, 1)[0]);
+      }
+      */
+      
+      /*
+      markPlayers(area, (unmarked, marked) => {
+        console.log(`${unmarked.id} fought with ${unmarked.foughtWith} with a power of ${unmarked.getFightingChance()} and ${marked.getFightingChance()} respectively`)
+        console.log(`${unmarked.isAlive ? marked.id : unmarked.id} died with the fight. \n`)
+      })
+  
+      for (let i = 0; i < area.players.length; i++) {
+        sweepPlayer(area, i);
+      }
+      */
+    })
+    
+    // console.dir(adj_list, {depth: null})
   }
+  console.log(`${getPlayersLength(adj_list)} players left.`)
+}
 
-  /*
-  markPlayers(area, (unmarked, marked) => {
-    console.log(`${unmarked.id} fought with ${unmarked.foughtWith} with a power of ${unmarked.getFightingChance()} and ${marked.getFightingChance()} respectively`)
-    console.log(`${unmarked.isAlive ? marked.id : unmarked.id} died with the fight. \n`)
+function moveTo(area: Area, current: string) {
+  area.players.forEach((player, index, arr) => {
+    console.log(chalk.bgRed(index))
+    console.log(`${player.id}'s turn.`)
+
+    if (!player.hasMoved) {
+      const ran = generateRandomNumber(area.to.length - 1);
+      const chosenArea = adj_list.get(area.to[ran])!
+
+      console.log(`${area.to[ran]} area chosen by ${player.id} from ${current}`);
+      player.currentArea = area.to[ran]
+      chosenArea.players.push(arr.splice(index, 1)[0]);
+
+      player.hasMoved = true;
+    }
   })
-
-  for (let i = 0; i < area.players.length; i++) {
-    sweepPlayer(area, i);
-  }
-  */
-})
-
-console.log(`${getPlayersLength(adj_list)} players left.`)
-console.dir(adj_list, {depth: null})
+}
