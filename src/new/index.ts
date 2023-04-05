@@ -7,39 +7,29 @@ import {
   shallowTraverseGraph
 } from "./core/area.js";
 import { markPlayers, sweepPlayer } from "./core/actions/mark.js";
-import { arrayMoveTo } from "./core/actions/move.js";
+import { arrayMoveTo } from "./core/actions/batchMove.js";
 
-const hv_objects = [
-  "Road",
-  "Alice's House",
-  "Small's House",
-  "Plaza"
-];
-const hv_routes = [
-  ["Alice's House", "Road"],
-  ["Alice's House", "Plaza"],
-  ["Small's House", "Road"],
-  ["Road", "Plaza"]
-];
+import { hv_objects, hv_routes } from "./core/data/locations/humanvillage.js";
 
-const adj_list = createGraph(hv_objects, hv_routes)
-const road = adj_list.get("Road")!
 
-const players = ["Froshi", "Alice", "Small", "Juul"]
-const chance_movement = 10;
-const damage_limit = 1000;
+const human_village = createGraph(hv_objects, hv_routes)
+const road = human_village.get("Road")!
+
+const players = ["Froshi", "Alice", "Small", "Juul", "Therapy"]
+const stay_chance = 45;
+const damage_limit = 10000;
 
 for (const play of players) {
-  const player = new Player(play, 1000, 10);
+  const player = new Player(play, damage_limit, stay_chance);
   player.currentArea = "Road";
   road.players.push(player);
 }
 
 console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
-console.log(chalk.green(`${getPlayersLength(adj_list)} players fighting.`))
+console.log(chalk.green(`${getPlayersLength(human_village)} players fighting.`))
 
 const prev = performance.now()
-main(adj_list)
+main(human_village)
 const curr = performance.now()
 
 console.log(`${chalk.bgGreen(chalk.black(`Performance`))}: ${curr-prev}ms taken.`)
