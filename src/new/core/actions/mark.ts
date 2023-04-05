@@ -2,6 +2,8 @@ import { Area } from "../area.js";
 import { Player } from "../player.js";
 
 export function markPlayers(area: Area, onMarked?: (unmarked: Player, marked: Player) => void) {
+  if (area.players.length == 0) return;
+
   area.players.reduce((prev, curr) => {
     if (!prev.isAlive || !curr.isAlive) return curr;
 
