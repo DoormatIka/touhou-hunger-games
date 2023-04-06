@@ -61,14 +61,23 @@ export function getAreaLength(
  * @param adj_list - the adjacent list
  * @returns number of players
  */
-export function getPlayersLength(
-  adj_list: Map<string, Area>,
-) {
+export function getPlayersLength(adj_list: Map<string, Area>) {
   let i = 0;
-  const keys = [...adj_list.keys()];
-  for (const key of keys) {
+  for (const key of adj_list.keys()) {
     const area = adj_list.get(key);
     i += area?.players.length ?? 0;
   }
   return i;
+}
+
+export function getLastPlayer(adj_list: Map<string, Area>) {
+  for (const key of adj_list.keys()) {
+    const area = adj_list.get(key);
+    if (!area)
+      continue;
+
+    if (area.players.length !== 0) {
+      return area.players[0]
+    }
+  }
 }

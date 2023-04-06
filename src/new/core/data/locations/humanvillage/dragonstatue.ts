@@ -1,5 +1,14 @@
-const ds_rooms: string[] = []
+export const ds_rooms: string[] = [
+  "Statue",
+  "Dragon Road",
+]
 
-const ds_routes: string[][] = []
+export const ds_routes: string[][] = [
+  ["Statue", "Dragon Road"],
+  ["Statue", "Road to Small's Shrine"],
+]
 
-const ds_gates: { name: string, gate_name: string }[] = []
+export const ds_gates: string[] = [
+  "Dragon Road",
+  "Road to Small's Shrine"
+]

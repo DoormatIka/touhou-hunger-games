@@ -13,6 +13,10 @@ Planned features for a **Beta Release**:
   - Will be played via CLI.
     - The website will be hosted on an alpha release.
 
+
+---
+
+
 ## Development Notes
 ### Locations
 They're locations in the `src/new/core/data/locations` folder which is followed by more folders in it named `humanvillage`, etc.
