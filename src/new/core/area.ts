@@ -6,7 +6,8 @@ export class Area {
 }
 
 // Maps are better for Data Structures
-export function createGraph(objects: Array<string>, routes: Array<Array<string>>) {
+export function createGraph(args: {objects: Array<string>, routes: Array<Array<string>>}) {
+  const { objects, routes } = args;
   const adj_list = new Map<string, Area>();
 
   objects.forEach(object => addNode(object, adj_list))
