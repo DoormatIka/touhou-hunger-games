@@ -58,7 +58,7 @@ export function combineSubLocations(
           if (v === connectors.gate_name) {
             return `${connectors.gate_name} ${connectors.name}`;
           }
-          return `${location.name} - ${v}`
+          return `${location.name} >> ${v}`
         }))
       }
     }

@@ -12,7 +12,7 @@ import { arrayMoveTo } from "./core/actions/batchMove.js";
 import { hv_objects, hv_routes } from "./core/data/locations/humanvillage.js";
 
 
-const human_village = createGraph(hv_objects, hv_routes)
+const human_village = createGraph({ objects: hv_objects, routes: hv_routes})
 const road = human_village.get("Road")!
 
 const players = ["Froshi", "Alice", "Small", "Juul", "Therapy"]
