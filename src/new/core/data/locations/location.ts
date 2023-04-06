@@ -15,21 +15,19 @@ const ds_routes = [
 ]
 
 const hh_objects = [
-  "Lily's Room", "Gate",
+  "Lily's Room", "Room",
   "Youmu's Room",
 ]
 const hh_routes = [
-  ["Lily's Room", "Gate"],
-  ["Youmu's Room", "Gate"]
+  ["Lily's Room", "Room"],
+  ["Youmu's Room", "Lily's Room"]
 ]
 
-const combined = combineSubLocations(
-  { name: "Human Village", objects: hv_objects, routes: hv_routes, gate: ["DS-HV"] },
-  { name: "Dragon Statue", objects: ds_objects, routes: ds_routes, gate: ["DS-HV", "HH-HV"] },
-  { name: "Lily's Home", objects: hh_objects, routes: hh_routes, gate: ["HH-HV", "PP-PPPPP"] }
-)
-
-console.log(createGraph(combined.objects, combined.routes))
+console.log(createGraph(combineSubLocations(
+  { name: "Human Village", objects: hv_objects, routes: hv_routes, gate: [{ name: "Dragon", gate_name: "Gate" }] },
+  { name: "Dragon Statue", objects: ds_objects, routes: ds_routes, gate: [{ name: "Lily's", gate_name: "Room" }, { name: "Dragon", gate_name: "Gate" }] },
+  { name: "Lily's Home", objects: hh_objects, routes: hh_routes, gate: [{ name: "Lily's", gate_name: "Room" }] }
+)))
 
 // gate for connecting/merging two graphs together
 export function combineSubLocations(
@@ -37,7 +35,7 @@ export function combineSubLocations(
     name: string,
     objects: string[],
     routes: string[][],
-    gate: string[]
+    gate: { name: string, gate_name: string }[]
   }[]
 ) {
   const objects: Set<string> = new Set();
@@ -45,20 +43,20 @@ export function combineSubLocations(
 
   for (const location of locations) {
     for (const localobject of location.objects) { // REFRACTOR!!
-      if (localobject === "Gate") {
-        for (const connectors of location.gate) {
-          objects.add(`Gate ${connectors}`); // something is duplicating here.
+      for (const connectors of location.gate) {
+        if (localobject === connectors.gate_name) {
+          objects.add(`${connectors.gate_name} ${connectors.name}`);
+          continue;
         }
-        continue;
+        objects.add(`${location.name} - ${localobject}`)
       }
-      objects.add(`${location.name} - ${localobject}`)
     }
 
     for (const localroutes of location.routes) { // ["Lily's Room", "Gate"]
       for (const connectors of location.gate) { // REFRACTOR!!
         routes.push(localroutes.map(v => {
-          if (v === "Gate") {
-            return `Gate ${connectors}`;
+          if (v === connectors.gate_name) {
+            return `${connectors.gate_name} ${connectors.name}`;
           }
           return `${location.name} - ${v}`
         }))
