@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Player } from "./core/player.js";
+import { PlayerPresets, createPlayers } from "./core/player.js";
 import {
   Area,
   createGraph,
@@ -11,65 +11,48 @@ import {
 import { markPlayers, sweepPlayer } from "./core/actions/mark.js";
 import { arrayMoveTo } from "./core/actions/batchMove.js";
 import { combineSubLocations } from "./core/data/locations/location.js";
-
 import { ds_rooms, ds_gates, ds_routes } from "./core/data/locations/humanvillage/dragonstatue.js"
 import { field1_gates, field1_rooms, field1_routes } from "./core/data/locations/humanvillage/fields/field1.js"
 import { hh_gates, hh_rooms, hh_routes } from "./core/data/locations/humanvillage/hiedahouse.js"
 import { ss_rooms, ss_gates, ss_routes } from "./core/data/locations/humanvillage/smallshrine.js";
 import { chooseKill } from "./core/data/responses/response.js";
 
+import playerConfig from "./player_config.json" assert { type: "json" };
 
+console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 
-const players = ["Froshi", "Alice", "Small", "Juul", "Therapy", "Gemma", "Aoko"]
-const damage_limit = 100;
-const stay_chance = 15;
 const human_village = createGraph(combineSubLocations(
   { name: "Grass Fields", objects: field1_rooms, routes: field1_routes, gate: field1_gates },
   { name: "Dragon Statue", objects: ds_rooms, routes: ds_routes, gate: ds_gates },
   { name: "Hieda House", objects: hh_rooms, routes: hh_routes, gate: hh_gates },
   { name: "Small Shrine", objects: ss_rooms, routes: ss_routes, gate: ss_gates }
 ));
-const road = human_village.get("Dragon Road")!
-
-for (const play of players) {
-  const player = new Player(play, damage_limit, stay_chance);
-  player.currentArea = "Dragon Road";
-  road.players.push(player);
-}
-console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
-
-// const prev = performance.now()
-
-const rounds = main(human_village)
-console.log(`${chalk.bgGreen(chalk.black(`Stay chance`))}: ${stay_chance}.`)
-console.log(`${chalk.bgGreen(chalk.black(`Rounds`))}: ${rounds}. \n`)
-// const curr = performance.now()
-
-// console.log(`${chalk.bgGreen(chalk.black(`Performance`))}: ${curr-prev}ms taken.`)
+const road = human_village.get("Dragon Road")!
+road.players.push(...createPlayers(playerConfig as { player: string, preset: PlayerPresets }[], "Dragon Road"))
+const last_player = main(human_village)
 
 
 function main(adj_list: Map<string, Area>) {
   let rounds = 0;
-
-  while (getPlayersLength(adj_list) > 1) {
+  // while (getPlayersLength(adj_list) > 1)
+  for (let i = 0; i < 10; i++) {
     console.log(chalk.bgGray(chalk.bold(`Move ${rounds}`)))
 
     shallowTraverseGraph(adj_list, (area, current) => {
       arrayMoveTo(area, adj_list,
         (player, moved_to) => {
-          console.log(`${chalk.bgGreenBright(chalk.black("MOVE"))}: ${player.id} moved to "${moved_to}" from "${current}"`)
+          // console.log(`${chalk.bgGreenBright(chalk.black("MOVE"))}: ${chalk.blueBright(player.id)} [${player.getType()}] moved to "${moved_to}" from "${current}"`)
         },
         (player) => {
-          console.log(`${chalk.bgGreen("STAY")}: ${player.id} stayed in "${current}"`)
+          // console.log(`${chalk.bgGreen("STAY")}: ${chalk.blueBright(player.id)} [${player.getType()}] stayed in "${current}"`)
         });
     })
 
-
     shallowTraverseGraph(adj_list, (area, curr) => {
       markPlayers(area, (unmarked, marked) => {
-        console.log(`${chalk.bgRed("KILL")}: ${chooseKill(marked.id, unmarked.id, marked.getFightingChance(), unmarked.getFightingChance())}`)
-        console.log(`${chalk.bgGrey("DIED")}: ${unmarked.isAlive ? marked.id : unmarked.id} died with the fight.`)
+        // console.log(`${chalk.bgRed("KILL")}: ${chooseKill(marked.id, unmarked.id, marked.getFightingChance(), unmarked.getFightingChance())}`)
+        // console.log(`${chalk.bgGrey("DIED")}: ${unmarked.isAlive ? marked.id : unmarked.id} died in ${curr}`)
       })
 
       for (let i = 0; i < area.players.length; i++) {
@@ -79,9 +62,10 @@ function main(adj_list: Map<string, Area>) {
     })
     rounds++;
   }
+  const last_player = getLastPlayer(adj_list);
 
-  // console.log(chalk.green(`${getPlayersLength(adj_list)} players left.`))
-  console.log(`${chalk.bgYellowBright(chalk.black(`WIN`))}: ${getLastPlayer(adj_list)?.id} won!`) 
-  // console.log(`Developed by ${chalk.bgBlack(`${chalk.blueBright("7")} ${chalk.yellowBright("Colors")} ${chalk.redBright("Alice")}`)}.`)
-  return rounds;
+  console.log(chalk.green(`${getPlayersLength(adj_list)} players left.`))
+  console.log(`${chalk.bgYellowBright(chalk.black(`WIN`))}: ${last_player?.id} [${last_player?.getType()}] won!`) 
+  console.log(`Developed by ${chalk.bgBlack(`${chalk.blueBright("7")} ${chalk.yellowBright("Colors")} ${chalk.redBright("Alice")}`)}.`)
+  return { rounds, last_player }
 }

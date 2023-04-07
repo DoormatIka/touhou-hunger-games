@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "noderun": "tsc && node ./build/index.js",
-    "b": "bun run ./src/core/index.ts",
+    "index": "bun run ./src/index.ts",
+    "balance": "bun run ./src/perf/balancing.ts",
+    "perf": "bun run ./src/perf/speed.ts",
     "profile": "node --inspect-brk ./build/index.js"
   },
   "author": "",
