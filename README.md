@@ -48,6 +48,7 @@ The source code for these are in the commit messages and I don't want to dig it 
 | Shallow (new moveTo)           | 20             | 20            | 21 - 24       | 47 - 53        |
 
 DFS => Shallow (old): 69x -> 38x -> 32x
+
 DFS => Shallow (new): 10 419x -> 10 501x -> 9 334x
 
 #### DFS Tree Traversal & Shallow (old) iterates through the graph every time a process is called.
