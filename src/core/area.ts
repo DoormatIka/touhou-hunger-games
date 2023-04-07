@@ -1,7 +1,7 @@
 import { Player } from "./player.js"
 
 export class Area {
-  public players: Player[] = []
+  public players: Player[] = [] // if needed, turn this into a hashmap/Map object
   public to: string[] = []
 }
 
