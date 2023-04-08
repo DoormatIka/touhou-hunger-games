@@ -76,6 +76,10 @@ This removes the looping of the graph from the top for every function. The funct
 
 **HashMap Approach (Future)**
 
-There is now a location value string set inside the Players object. I could use that to directly access the node I want to go to via HashMap and do movement, damage comparisons, and other stuff there. It could remove the need to be worried for the size of the adjacent list and turn it from O(n) into O(1).
+There is now a location value string set inside the Players object. I could use that to directly access the node I want to go to via HashMap and do movement, damage comparisons, and other stuff there. It could remove the need to be worried for the size of the adjacent list and turn it from O(n) into O(1). 
+
+I would need to keep track of the players though so I have to do another array pointing to the players objects to be able to search through the adjacent list. This doubles size consumption to the players. Though, it *is* a good tradeoff since the number of players will be significantly lower than the number of areas. (1 player => 20 areas proportions)
+
+I could just switch out the shallow approach with the hashmap approach when the areas get big enough.
 
 I will do this if it's worth it and if the scope of the project widens, but for now, I am not doing it. It's already fast enough.
