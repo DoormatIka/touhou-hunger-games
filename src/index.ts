@@ -42,14 +42,14 @@ const human_village = createGraph(combineSubLocations( // combineSubLocations ca
 
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))
-// console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
-
+console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
+/*
 traverseBFSGraph("Dragon Road", human_village, (ahead, current) => {
   console.log(`${current} => ${ahead}`)
 })
 console.log(`Number of areas: ${getAreaLength(human_village)}`)
-
-// const last_player = main(human_village)
+*/
+const last_player = main(human_village)
 
 
 function main(adj_list: Map<string, Area>) {
