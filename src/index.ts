@@ -8,9 +8,9 @@ import {
   getPlayersLength,
   shallowTraverseGraph
 } from "./core/area.js";
-import { markPlayers, sweepPlayer } from "./core/actions/mark.js";
+import { vsPlayers, sweepPlayer, randomDeathPlayers } from "./core/actions/mark.js";
 import { arrayMoveTo } from "./core/actions/batchMove.js";
-import { combineSubLocations } from "./core/data/locations/location.js";
+import { combineSubLocations, traverseBFSGraph } from "./core/data/locations/location.js";
 
 import { ds_rooms, ds_gates, ds_routes } from "./core/data/locations/humanvillage/dragonstatue.js"
 import { field1_gates, field1_rooms, field1_routes } from "./core/data/locations/humanvillage/fields/hiedafields.js"
@@ -19,7 +19,7 @@ import { ss_rooms, ss_gates, ss_routes } from "./core/data/locations/humanvillag
 import { houses_rooms, houses_routes, houses_gates } from "./core/data/locations/humanvillage/houses.js";
 import { v_fields_rooms, v_fields_gates, v_fields_routes } from "./core/data/locations/humanvillage/fields/villagefields.js";
 
-import { chooseKill } from "./core/data/responses/response.js";
+import { chooseDeath, chooseKill } from "./core/data/responses/response.js";
 
 import playerConfig from "./player_config.json" assert { type: "json" };
 
@@ -33,11 +33,16 @@ const human_village = createGraph(combineSubLocations( // combineSubLocations ca
   { name: "Houses", objects: houses_rooms, routes: houses_routes, gate: houses_gates },
   { name: "Village Fields", objects: v_fields_rooms, routes: v_fields_routes, gate: v_fields_gates }
 ));
+
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))
-console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
+// console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
 
-const last_player = main(human_village)
+traverseBFSGraph("Dragon Road", human_village, (ahead, current) => {
+  console.log(`${current} => ${ahead}`)
+})
+
+// const last_player = main(human_village)
 
 
 function main(adj_list: Map<string, Area>) {
@@ -57,11 +62,15 @@ function main(adj_list: Map<string, Area>) {
     })
 
     shallowTraverseGraph(adj_list, (area, curr) => {
-      markPlayers(area, (unmarked, marked) => {
-        console.log(`${chalk.bgRed("KILL")}: ${chooseKill(marked.id, unmarked.id, marked.getFightingChance(), unmarked.getFightingChance())}`)
-        console.log(`${chalk.bgGrey("DIED")}: ${unmarked.isAlive ? marked.id : unmarked.id} died in ${curr}`)
-      })
-
+      if (rounds > 3) {
+        vsPlayers(area, (unmarked, marked) => {
+          console.log(`${chalk.bgRed("KILL")}: ${chooseKill(marked.id, unmarked.id, marked.getFightingChance(), unmarked.getFightingChance())}`)
+          console.log(`${chalk.bgGrey("DIED")}: ${unmarked.isAlive ? marked.id : unmarked.id} died in ${curr}`)
+        })
+        randomDeathPlayers(area, (dead) => {
+          console.log(`${chalk.bgGrey("DIED")}: ${chooseDeath(dead.id)}`)
+        })
+      }
       for (let i = 0; i < area.players.length; i++) {
         area.players[i].hasPlayed = false;
         sweepPlayer(area, i);
@@ -72,7 +81,7 @@ function main(adj_list: Map<string, Area>) {
   const last_player = getLastPlayer(adj_list);
 
   console.log(chalk.green(`${getPlayersLength(adj_list)} players left.`))
-  console.log(`${chalk.bgYellowBright(chalk.black(`WIN`))}: ${last_player?.id} won!`) 
+  console.log(`${chalk.bgYellowBright(chalk.black(`WIN`))}: ${last_player?.id} won!`)
   console.log(`Developed by ${chalk.bgBlack(`${chalk.blueBright("7")} ${chalk.yellowBright("Colors")} ${chalk.redBright("Alice")}`)}.`)
   return { rounds, last_player }
 }
