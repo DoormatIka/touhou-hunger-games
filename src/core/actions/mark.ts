@@ -1,11 +1,26 @@
 import { Area } from "../area.js";
 import { Player } from "../player.js";
 
-export function markPlayers(area: Area, onMarked?: (unmarked: Player, marked: Player) => void) {
-  if (area.players.length == 0) return;
 
-  area.players.reduce((prev, curr) => {
-    if (!prev.isAlive || !curr.isAlive) return curr;
+/**
+ * Compares 2 players and makes them fist fight.
+ * 
+ * Should be before randomDeathPlayers
+ * @param area 
+ * @param onKillMarked 
+ * @returns 
+ */
+export function vsPlayers(
+  area: Area,
+  onKillMarked?: (unmarked: Player, marked: Player) => void
+) {
+  if (area.players.length <= 1) return;
+
+  for (let i = 0; i < area.players.length; i++) {
+    const curr = area.players[i];
+    const prev = i > 0 ? area.players[i - 1] : null;
+    if (!prev?.isAlive || !curr.isAlive)
+      continue;
 
     prev.generateFightingChance()
     curr.generateFightingChance()
@@ -14,11 +29,29 @@ export function markPlayers(area: Area, onMarked?: (unmarked: Player, marked: Pl
 
     if (prev.getFightingChance() > curr.getFightingChance()) {
       curr.kill();
-      if (onMarked)
-        onMarked(prev, curr)
+      if (onKillMarked)
+        onKillMarked(prev, curr);
     }
-    return curr;
-  })
+  }
+}
+
+export function randomDeathPlayers(
+  area: Area,
+  onKill?: (player: Player) => void
+) {
+  for (let i = 0; i < area.players.length; i++) {
+    const curr = area.players[i];
+    if (!curr.isAlive)
+      continue;
+    
+    curr.generateRandomDeathChance();
+    const death_chance = curr.getRandomDeathChance();
+    if (death_chance.chance < death_chance.half) {
+      curr.kill();
+      if (onKill)
+        onKill(curr);
+    }
+  }
 }
 
 export function sweepPlayer(area: Area, index: number) {
