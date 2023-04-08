@@ -15,29 +15,30 @@ export function arrayMoveTo(
 ) {
   for (let i = area.players.length - 1; i >= 0; i--) {
     const player = area.players[i];
-    if (player.hasPlayed) 
+    if (player.hasPlayed)
       continue;
 
-      player.generateMoveChances();
-      const move_chance = player.getMoveChance()
-      if (move_chance.chance < move_chance.half) {
-        player.hasPlayed = true;
-        if (onStay)
-          onStay(player)
-        continue;
-      }
+    player.generateMoveChances();
+    const move_chance = player.getMoveChance()
+    if (move_chance.chance < move_chance.half) {
+      player.hasPlayed = true;
+      if (onStay)
+        onStay(player)
+        
+      continue;
+    }
 
     const ran = generateRandomNumber(area.to.length);
     moveTo(area, adj_list, player, i, ran);
     if (onMove)
       onMove(player, area.to[ran])
-    
+
   }
 }
 function moveTo(
-  area: Area, 
-  adj_list: Map<string, Area>, 
-  player: Player, 
+  area: Area,
+  adj_list: Map<string, Area>,
+  player: Player,
   player_index: number,
   area_index: number
 ) {
