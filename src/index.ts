@@ -25,7 +25,7 @@ import playerConfig from "./player_config.json" assert { type: "json" };
 
 console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 
-const human_village = createGraph(combineSubLocations(
+const human_village = createGraph(combineSubLocations( // combineSubLocations can be hard coded, saving CPU time
   { name: "Grass Fields", objects: field1_rooms, routes: field1_routes, gate: field1_gates },
   { name: "Dragon Statue", objects: ds_rooms, routes: ds_routes, gate: ds_gates },
   { name: "Hieda House", objects: hh_rooms, routes: hh_routes, gate: hh_gates },
@@ -36,6 +36,7 @@ const human_village = createGraph(combineSubLocations(
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))
 console.log(chalk.green(`${getPlayersLength(human_village)} players fighting with ${getAreaLength(human_village)} rooms.`))
+
 const last_player = main(human_village)
 
 

@@ -65,7 +65,7 @@ export function createPlayers(
 ) {
   const players = []
   for (const player_name of players_config) {
-    const player = new Player(player_name, 100, 15);
+    const player = new Player(player_name, 1000, 30);
     player.currentArea = currentArea;
     players.push(player);
   }
