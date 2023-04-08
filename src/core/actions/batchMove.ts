@@ -28,9 +28,7 @@ export function arrayMoveTo(
       }
 
     const ran = generateRandomNumber(area.to.length);
-    console.time("splice")
     moveTo(area, adj_list, player, i, ran);
-    console.timeEnd("splice")
     if (onMove)
       onMove(player, area.to[ran])
     
@@ -47,9 +45,6 @@ function moveTo(
 
   player.currentArea = area.to[area_index];
   player.hasPlayed = true;
-  // is pop better?
-  
-    chosen_area.players.push(area.players.splice(player_index, 1)[0]);
-  
+  chosen_area.players.push(area.players.splice(player_index, 1)[0]);
 }
 

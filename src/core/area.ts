@@ -33,13 +33,6 @@ export function shallowTraverseGraph(adj_list: Map<string, Area>, func: (area: A
   }
 }
 
-export function depthlessKeyGraph(adj_list: Map<string, Area>, key: string, func: (area: Area) => void) {
-  const curr_area = adj_list.get(key);
-  if (curr_area) {
-    func(curr_area)
-  }
-}
-
 /**
  * Returns the number of areas.
  * 

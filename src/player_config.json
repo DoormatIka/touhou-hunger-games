@@ -1,8 +1,8 @@
 [
-  { "player": "Froshi" , "preset": "TANK" },
-  { "player": "Alice"  , "preset": "TANK" },
-  { "player": "Maribel", "preset": "NORMAL" },
-  { "player": "Froshi1" , "preset": "NORMAL" },
-  { "player": "Aoko1"   , "preset": "LIGHT" },
-  { "player": "Aoko2"   , "preset": "LIGHT" }
+  "Froshi",
+  "Alice",
+  "Maribel",
+  "Aoko",
+  "Therapy",
+  "Renko"
 ]
