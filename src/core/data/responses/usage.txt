@@ -1,11 +1,7 @@
-[kill.json]
-"$p1 $p2"
-p1 gets replaced by the player 1 id
-p2 gets replaced by the player 2 id
+[kill.json] is for player to player fights
+[death.json] is for random deaths that happen
+[stay.json] is for people staying in their position.
 
-"$dam1 $dam2"
-dam1 gets replaced by the player 1's damage
-dam2 gets replaced by the player 2's damage
 
 
 MAKING A LIBRARY FOR FAST STRING REPLACEMENT
