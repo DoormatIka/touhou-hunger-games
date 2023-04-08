@@ -3,13 +3,16 @@ export const v_fields_rooms: string[] = [
   "1",
   "2",
   "3",
-  "4"
+  "4",
 ]
 
 export const v_fields_routes: string[][] = [
   ["1", "Village Road"],
-  ["2", "3"],
-  ["4", "Houses Road"]
+  ["1", "2"], ["2", "3"], ["3", "4"],
+  ["1", "3"], ["2", "4"],
+  ["1", "4"], 
+  ["4", "Houses Road"],
+  ["3", "Houses Road"]
 ]
 
 export const v_fields_gates: string[] = [

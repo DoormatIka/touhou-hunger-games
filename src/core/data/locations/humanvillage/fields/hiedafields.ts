@@ -1,13 +1,15 @@
 export const field1_rooms: string[] = [
-  "Hieda Field",
+  "1",
 ]
 
 export const field1_routes: string[][] = [
-  ["Hieda Field", "Dragon Road"],
-  ["Hieda Field", "Hieda Entrance"]
+  ["1", "Dragon Road"],
+  ["1", "Hieda Entrance"],
+  ["1", "Grassy Trail"]
 ]
 
 export const field1_gates: string[] = [
   "Dragon Road",
-  "Hieda Entrance"
+  "Hieda Entrance",
+  "Grassy Trail"
 ]

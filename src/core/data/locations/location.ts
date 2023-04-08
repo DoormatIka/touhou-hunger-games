@@ -2,6 +2,15 @@ import { Area, createGraph } from "../../area.js";
 
 
 // gate for connecting/merging two graphs together
+/**
+ * Connects two graphs together.
+ * 
+ * @param locations locations to combine
+ *  - gate: entry points when connecting the two graphs together
+ *  - routes: connecting the gates and objects together
+ *  - objects: the rooms in your locations
+ * @returns the combined objects and routes
+ */
 export function combineSubLocations(
   ...locations: {
     name: string,
