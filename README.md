@@ -36,22 +36,18 @@ createGraph(combineSubLocations(
 ### Performance
 There are three processes that are in this project: moving players, marking players, and deleting marked players.
 
-Measured in *milliseconds*. Ran with normal nodejs, bun has a 1.2-1.3x speed up.
+Measured in *seconds*. Ran with bun.
 
-The benchmark measures how fast moving 3000 players through 1000 areas randomly is.
+The benchmark measures how fast moving 25 players through 9001 areas randomly is.
 
-The source code for these are in the commit messages and I don't want to dig it up (I'll do it prolly).
-| Methods                        | Iterations 15  | Iterations 30 | Iterations 45 | Iterations 300 |
-|--------------------------------|----------------|---------------|---------------|----------------|
-| DFS Tree Traversal             | 208380         | 210029        | 224029        | ~              |
-| Shallow (old moveTo)           | 2812 - 3000    | 4627 - 5502   | 6375 - 6946   | ~              |
-| Shallow (new moveTo)           | 20             | 20            | 21 - 24       | 47 - 53        |
+The source code for these are in src/perf/speed.ts. It's averaged through "Iterations x"
+| Methods                | Iterations 15  | Iterations 30 | Iterations 300 | Iteration 1 |
+|------------------------|----------------|---------------|----------------|-------------|
+| DFS Tree Traversal     | 346            | 1066.15       | 5710           | 29.10       |
+| Shallow (new moveTo)   | 87 (3.97x)     | 281.65 (3.78x)| 783.88 (7.3x)  | 7.23 (4.02x)|
 
-DFS => Shallow (old): 69x -> 38x -> 32x
 
-DFS => Shallow (new): 10 419x -> 10 501x -> 9 334x
-
-#### DFS Tree Traversal & Shallow (old) iterates through the graph every time a process is called.
+#### DFS Tree Traversal iterates through the graph every time a process is called.
 When moving players gets called, it loops through the graph from the top. That loop repeats for every process called.
 This isn't very costly on small areas but I'm trying to make a massive world here, so this will not cut it.
 
@@ -61,16 +57,14 @@ DFS is implemented by this tutorial: https://www.youtube.com/watch?v=cWNEl4HE2OE
 
 The graph gets turned into an adjacent list with a HashMap. It basically acts like a linked list with different objects/Areas being "connected" together by string ids. 
 
+**Shallow**
+
 Using a linked list-like for a graph that's immutable is extremely inefficient for large quantities, so I treated it like an array.
 
 And, I don't even need to go that deep for my game. I just wanted the players to move 1 area at a time, I don't need to implement a DFS.
 
-**Shallow (old)**
-
 This method takes that adjacent list and treats it as an array to be iterated through, meaning it has O(n) instead of O(V + E).
-This is a 69x improvement over DFS with the same surrounding code as DFS.
-
-**Shallow (new)**
+This is a 4.02x improvement over DFS.
 
 This removes the looping of the graph from the top for every function. The functions only rely on single values now, making the loop the responsibility of the code that called the function.
 
