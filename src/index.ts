@@ -10,35 +10,14 @@ import {
 } from "./core/area.js";
 import { vsPlayers, sweepPlayer, randomDeathPlayers } from "./core/actions/mark.js";
 import { arrayMoveTo } from "./core/actions/batchMove.js";
-import { combineSubLocations, traverseBFSGraph } from "./core/data/locations/location.js";
-
-import { ds_rooms, ds_gates, ds_routes } from "./core/data/locations/humanvillage/dragonstatue.js"
-import { field1_gates, field1_rooms, field1_routes } from "./core/data/locations/humanvillage/fields/hiedafields.js"
-import { hh_gates, hh_rooms, hh_routes } from "./core/data/locations/humanvillage/hiedahouse.js"
-import { ss_rooms, ss_gates, ss_routes } from "./core/data/locations/humanvillage/smallshrine.js";
-import { houses_rooms, houses_routes, houses_gates } from "./core/data/locations/humanvillage/houses.js";
-import { v_fields_rooms, v_fields_gates, v_fields_routes } from "./core/data/locations/humanvillage/fields/villagefields.js";
-import { kappa_gates, kappa_rooms, kappa_routes } from "./core/data/locations/humanvillage/kappawarehouse.js";
-import { geidontei_gates, geidontei_rooms, geidontei_routes } from "./core/data/locations/humanvillage/geidontei.js";
-
 import { chooseDeath, chooseKill, chooseMove, chooseStay } from "./core/data/responses/response.js";
 
+import human_village_scaffold from "./core/data/locations/compiled/humanvillage.json" assert { type: "json" }
 import playerConfig from "./player_config.json" assert { type: "json" };
-import { suzunaan_gates, suzunaan_rooms, suzunaan_routes } from "./core/data/locations/humanvillage/suzunaan.js";
 
 console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 
-const human_village = createGraph(combineSubLocations( // combineSubLocations can be hard coded, saving CPU time
-  { name: "Hieda Fields", objects: field1_rooms, routes: field1_routes, gate: field1_gates },
-  { name: "Dragon Statue", objects: ds_rooms, routes: ds_routes, gate: ds_gates },
-  { name: "Hieda House", objects: hh_rooms, routes: hh_routes, gate: hh_gates },
-  { name: "Small Shrine", objects: ss_rooms, routes: ss_routes, gate: ss_gates },
-  { name: "Houses", objects: houses_rooms, routes: houses_routes, gate: houses_gates },
-  { name: "Village Fields", objects: v_fields_rooms, routes: v_fields_routes, gate: v_fields_gates },
-  { name: "Kappa", objects: kappa_rooms, routes: kappa_routes, gate: kappa_gates },
-  { name: "Geidontei", objects: geidontei_rooms, routes: geidontei_routes, gate: geidontei_gates },
-  { name: "Suzunaan", objects: suzunaan_rooms, routes: suzunaan_routes, gate: suzunaan_gates },
-));
+const human_village = createGraph(human_village_scaffold);
 
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))

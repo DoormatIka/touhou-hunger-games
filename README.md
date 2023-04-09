@@ -16,7 +16,6 @@ Planned features for a **Beta Release**:
 
 ---
 
-
 ## Development Notes
 ### Locations
 They're locations in the `src/new/core/data/locations` folder which is followed by more folders in it named `humanvillage`, etc.
@@ -24,14 +23,12 @@ They are there to be able to structure locations into a more readable state.
 
 In those folders you find a lot of files named: `dragonstatue.ts`, `geidontei.ts`, etc. They are the areas the players moves in. They declare how many sub-areas, what the routes between those sub-areas are, and the "gates" that make them accessible to other areas.
 
-Those files/areas are all combined into one graph data structure with this snippet:
-```ts
-createGraph(combineSubLocations(
-  { name: "Human Village", objects: hv_objects, routes: hv_routes, gate: hv_gates },
-  { name: "Dragon Statue", objects: ds_objects, routes: ds_routes, gate: ds_gates },
-  { name: "Lily's Home",   objects: hh_objects, routes: hh_routes, gate: hh_gates },
-))
-```
+Those files/areas are all combined into one scaffold with this command:
+
+`bun "location compile"` or `npm run "location compile"`
+
+The scaffold is a .json file that is used to make the graph data structure in `core/index.ts`
+
 
 ### Performance
 There are three processes that are in this project: moving players, marking players, and deleting marked players.

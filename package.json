@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "index": "bun run ./src/index.ts",
+    "location compile": "bun run ./src/core/data/locations/compile.ts",
     "balance": "bun run ./src/perf/balancing.ts",
-    "perf": "bun run ./src/perf/speed.ts",
-    "profile": "node --inspect-brk ./build/index.js"
+    "perf": "bun run ./src/perf/speed.ts"
   },
   "author": "",
   "license": "ISC",
