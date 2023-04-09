@@ -21,7 +21,7 @@ import { v_fields_rooms, v_fields_gates, v_fields_routes } from "./core/data/loc
 import { kappa_gates, kappa_rooms, kappa_routes } from "./core/data/locations/humanvillage/kappawarehouse.js";
 import { geidontei_gates, geidontei_rooms, geidontei_routes } from "./core/data/locations/humanvillage/geidontei.js";
 
-import { chooseDeath, chooseKill } from "./core/data/responses/response.js";
+import { chooseDeath, chooseKill, chooseMove, chooseStay } from "./core/data/responses/response.js";
 
 import playerConfig from "./player_config.json" assert { type: "json" };
 import { suzunaan_gates, suzunaan_rooms, suzunaan_routes } from "./core/data/locations/humanvillage/suzunaan.js";
@@ -61,10 +61,10 @@ function main(adj_list: Map<string, Area>) {
     shallowTraverseGraph(adj_list, (area, current) => {
       arrayMoveTo(area, adj_list,
         (player, moved_to) => {
-          console.log(`${chalk.bgGreenBright(chalk.black("MOVE"))}: ${chalk.blueBright(player.id)} moved to "${moved_to}" from "${current}"`)
+          console.log(`${chalk.bgGreenBright(chalk.black("MOVE"))}: ${chooseMove(player.id, moved_to, current)}`)
         },
         (player) => {
-          console.log(`${chalk.bgGreen("STAY")}: ${chalk.blueBright(player.id)} stayed in "${current}"`)
+          console.log(`${chalk.bgGreen("STAY")}: ${chooseStay(player.id, current)}`)
         });
     })
 
