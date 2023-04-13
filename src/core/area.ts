@@ -3,7 +3,7 @@ import { Player } from "./player.js"
 export class Area {
   public players: Player[] = [] // if needed, turn this into a hashmap/Map object
   public to: string[] = []
-  public layer: number | undefined
+  public layer: number = 0
 }
 
 // Maps are better for Data Structures
@@ -72,6 +72,32 @@ export function getLastPlayer(adj_list: Map<string, Area>) {
 
     if (area.players.length !== 0) {
       return area.players[0]
+    }
+  }
+}
+
+/**
+ * Labels the distances from one point to multiple.
+ * @param root Where to start
+ * @param adj_list What graph to modify
+ */
+export function labelDistances(root: string, adj_list: Map<string, Area>) {
+  const queue: string[] = [root];
+  const visited = new Set<string>();
+  visited.add(root);
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const currentObject = adj_list.get(current)!
+    const currentDistance = currentObject.layer;
+
+    for (const neighbor of currentObject.to) {
+      if (!visited.has(neighbor)) {
+        const neighborObject = adj_list.get(neighbor)!
+        queue.push(neighbor);
+        visited.add(neighbor);
+        neighborObject.layer = currentDistance + 1;
+      }
     }
   }
 }

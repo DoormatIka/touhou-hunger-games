@@ -6,7 +6,8 @@ import {
   getAreaLength,
   getLastPlayer,
   getPlayersLength,
-  shallowTraverseGraph
+  shallowTraverseGraph,
+  labelDistances
 } from "./core/area.js";
 import { vsPlayers, sweepPlayer, randomDeathPlayers } from "./core/actions/mark.js";
 import { arrayMoveTo } from "./core/actions/batchMove.js";
@@ -18,6 +19,8 @@ import playerConfig from "./player_config.json" assert { type: "json" };
 console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 
 const human_village = createGraph(human_village_scaffold);
+labelDistances("Dragon Road", human_village)
+console.log(human_village)
 
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))
@@ -44,7 +47,7 @@ function main(adj_list: Map<string, Area>) {
         },
         (player) => {
           console.log(`${chalk.bgGreen("STAY")}: ${chooseStay(player.id, current)}`)
-        });
+        }, 0);
     })
 
     shallowTraverseGraph(adj_list, (area, curr) => {
