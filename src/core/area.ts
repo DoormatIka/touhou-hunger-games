@@ -3,6 +3,7 @@ import { Player } from "./player.js"
 export class Area {
   public players: Player[] = [] // if needed, turn this into a hashmap/Map object
   public to: string[] = []
+  public layer: number | undefined
 }
 
 // Maps are better for Data Structures
