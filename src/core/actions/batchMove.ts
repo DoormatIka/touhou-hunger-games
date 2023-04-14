@@ -12,10 +12,11 @@ export function arrayMoveTo(
   adj_list: Map<string, Area>,
   onMove: (player: Player, moved_to: string) => void,
   onStay: (player: Player) => void,
-  distance_limit?: number
+  onBarriered: (player: Player, moved_to: string) => void,
+  distance_limit: number
 ) {
-  for (let i = area.players.length - 1; i >= 0; i--) {
-    const player = area.players[i];
+  for (let player_index = area.players.length - 1; player_index >= 0; player_index--) {
+    const player = area.players[player_index];
     if (player.hasPlayed)
       continue;
 
@@ -26,7 +27,23 @@ export function arrayMoveTo(
     }
 
     const ran = generateRandomNumber(area.to.length);
-    moveTo(area, adj_list, player, i, ran);
+    const if_touching_barrier = moveTo(area, adj_list, player, player_index, ran, distance_limit);
+    if (if_touching_barrier?.barrier) {
+      // find any un-barriered area
+      // iffy performance
+
+      // only finds a barrier next to the player
+      // should find the nearest barrier to avoid players getting stuck inside a barrier.
+      const areas = area.to.filter(v => {
+        const area = adj_list.get(v)!
+        return area.layer < distance_limit;
+      });
+      const ran = generateRandomNumber(areas.length);
+      moveTo(area, adj_list, player, player_index, ran, distance_limit);
+      onBarriered(player, areas[ran])
+      continue;
+    }
+
     if (onMove)
       onMove(player, area.to[ran])
   }
@@ -49,14 +66,14 @@ function moveTo(
   player: Player,
   player_index: number,
   area_index: number,
-  distance_limit?: number
+  distance_limit?: number,
 ) {
   const chosen_area = adj_list.get(area.to[area_index])!;
 
-  if (distance_limit) {
-    if (chosen_area.layer < distance_limit) {
+  if (distance_limit !== undefined) {
+    if (chosen_area.layer > distance_limit) {
       player.hasPlayed = true;
-      return;
+      return { barrier: true }
     }
   }
 

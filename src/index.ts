@@ -20,7 +20,7 @@ console.log(chalk.bgWhite(chalk.black("Small Scans Hunger Games")))
 
 const human_village = createGraph(human_village_scaffold);
 labelDistances("Dragon Road", human_village)
-console.log(human_village)
+// console.log(human_village)
 
 const road = human_village.get("Dragon Road")!
 road.players.push(...createPlayers(playerConfig, "Dragon Road"))
@@ -36,6 +36,7 @@ const last_player = main(human_village)
 
 function main(adj_list: Map<string, Area>) {
   let rounds = 0;
+  let gaps = 15;
   // while (getPlayersLength(adj_list) > 1)
   while (getPlayersLength(adj_list) > 1) {
     console.log(chalk.bgGray(chalk.bold(`Move ${rounds}`)))
@@ -47,7 +48,10 @@ function main(adj_list: Map<string, Area>) {
         },
         (player) => {
           console.log(`${chalk.bgGreen("STAY")}: ${chooseStay(player.id, current)}`)
-        }, 0);
+        }, 
+        (player, moved_to) => {
+          console.log(`${chalk.bgBlue("GAPPED")}: ${player.id} has been pushed into ${moved_to} from ${current} because of a mysterious force...`)
+        }, gaps);
     })
 
     shallowTraverseGraph(adj_list, (area, curr) => {
@@ -66,6 +70,11 @@ function main(adj_list: Map<string, Area>) {
       }
     })
     rounds++;
+
+    if (gaps > 1 && rounds % 2) {
+      console.log(`${chalk.bgBlueBright("GAP SIZE")}: ${gaps}`)
+      gaps--;
+    }
   }
   const last_player = getLastPlayer(adj_list);
 
