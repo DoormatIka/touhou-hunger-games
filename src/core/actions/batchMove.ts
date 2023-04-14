@@ -33,7 +33,7 @@ export function arrayMoveTo(
       // iffy performance
 
       // only finds a barrier next to the player
-      // should find the nearest barrier to avoid players getting stuck inside a barrier.
+      // should find the nearest unbarriered area to avoid players getting stuck inside a barriered area.
       const areas = area.to.filter(v => {
         const area = adj_list.get(v)!
         return area.layer < distance_limit;

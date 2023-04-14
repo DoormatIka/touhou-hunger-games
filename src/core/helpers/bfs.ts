@@ -8,7 +8,7 @@ import { Area } from "../area.js";
 export function traverseBFSGraph(
   start: string,
   adj_list: Map<string, Area>,
-  func: (path_ahead: string, path_current: string, curr_area: Area) => void
+  func: (path_ahead: string, path_current: string, curr_area: Area) => void | boolean
 ) {
   const visited = new Set()
   const queue = [start];
@@ -24,7 +24,10 @@ export function traverseBFSGraph(
       if (!visited.has(to)) {
         visited.add(to);
         queue.push(to);
-        func(to, path, objects);
+        const if_return = func(to, path, objects);
+        if (if_return) {
+          break;
+        }
       }
     }
   }

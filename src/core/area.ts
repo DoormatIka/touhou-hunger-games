@@ -4,6 +4,7 @@ export class Area {
   public players: Player[] = [] // if needed, turn this into a hashmap/Map object
   public to: string[] = []
   public layer: number = 0
+  constructor(public name: string = "") {}
 }
 
 // Maps are better for Data Structures
@@ -21,7 +22,8 @@ function addEdge(origin: string, dest: string, adj: Map<string, Area>) {
   adj.get(dest)?.to.push(origin)
 }
 function addNode(name: string, adj: Map<string, Area>) {
-  adj.set(name, new Area())
+  const area = new Area(name)
+  adj.set(name, area)
 }
 
 
