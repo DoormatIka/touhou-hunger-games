@@ -27,13 +27,14 @@ export function arrayMoveTo(
       continue;
     }
 
-    const ran = generateRandomNumber(area.to.length);
-    const if_touching_barrier = moveTo(area, adj_list, player, player_index, ran, distance_limit);
-    // should find the nearest unbarriered area to avoid players getting stuck inside a barriered area.
-    if (if_touching_barrier?.barrier) {
+    const if_outside_barrier = detectIfOutsideBarrier(area, player, distance_limit);
+    if (if_outside_barrier) {
       barrierAllStepHandler(area, adj_list, distance_limit, player, player_index, onBarriered);
+      continue;
     }
-
+  
+    const ran = generateRandomNumber(area.to.length);
+    moveTo(area, adj_list, player, player_index, ran);
     if (onMove)
       onMove(player, area.to[ran])
   }
@@ -52,7 +53,7 @@ function barrierOneStepHandler(
     return area.layer < distance_limit;
   });
   const ran = generateRandomNumber(areas.length);
-  moveTo(area, adj_list, player, player_index, ran, distance_limit);
+  moveTo(area, adj_list, player, player_index, ran);
   onBarriered(player, areas[ran]);
 }
 
@@ -75,7 +76,9 @@ function barrierAllStepHandler(
       }
     })
   const free_area = adj_list.get(free)!;
-  free_area.players.push(area.players.splice(player_index, 1)[0]);
+  const chosen_player = area.players.splice(player_index, 1)[0];
+  free_area.players.push(chosen_player);
+  player.hasPlayed = true;
   onBarriered(player, free);
 }
 
@@ -89,6 +92,17 @@ function calculateStayChance(player: Player) {
   return false;
 }
 
+function detectIfOutsideBarrier(
+  chosen_area: Area,
+  player: Player,
+  distance_limit: number,
+) {
+  if (chosen_area.layer > distance_limit) {
+    player.hasPlayed = true;
+    return true;
+  }
+  return false;
+}
 
 function moveTo(
   area: Area,
@@ -96,16 +110,8 @@ function moveTo(
   player: Player,
   player_index: number,
   area_index: number,
-  distance_limit?: number,
 ) {
   const chosen_area = adj_list.get(area.to[area_index])!;
-
-  if (distance_limit !== undefined) {
-    if (chosen_area.layer > distance_limit) {
-      player.hasPlayed = true;
-      return { barrier: true }
-    }
-  }
 
   player.currentArea = area.to[area_index];
   player.hasPlayed = true;

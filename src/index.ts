@@ -71,7 +71,7 @@ function main(adj_list: Map<string, Area>) {
     })
     rounds++;
 
-    if (gaps > 1 && rounds % 2) {
+    if (gaps > 1 && rounds % 3) {
       console.log(`${chalk.bgBlueBright("GAP SIZE")}: ${gaps}`)
       gaps--;
     }
