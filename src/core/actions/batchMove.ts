@@ -1,4 +1,5 @@
 import { Area } from "../area.js";
+import { traverseBFSGraph } from "../helpers/bfs.js";
 import { Player, generateRandomNumber } from "../player.js";
 
 /**
@@ -28,20 +29,9 @@ export function arrayMoveTo(
 
     const ran = generateRandomNumber(area.to.length);
     const if_touching_barrier = moveTo(area, adj_list, player, player_index, ran, distance_limit);
+    // should find the nearest unbarriered area to avoid players getting stuck inside a barriered area.
     if (if_touching_barrier?.barrier) {
-      // find any un-barriered area
-      // iffy performance
-
-      // only finds a barrier next to the player
-      // should find the nearest unbarriered area to avoid players getting stuck inside a barriered area.
-      const areas = area.to.filter(v => {
-        const area = adj_list.get(v)!
-        return area.layer < distance_limit;
-      });
-      const ran = generateRandomNumber(areas.length);
-      moveTo(area, adj_list, player, player_index, ran, distance_limit);
-      onBarriered(player, areas[ran])
-      continue;
+      barrierAllStepHandler(area, adj_list, distance_limit, player, player_index, onBarriered);
     }
 
     if (onMove)
@@ -49,12 +39,52 @@ export function arrayMoveTo(
   }
 }
 
+function barrierOneStepHandler(
+  area: Area, 
+  adj_list: Map<string, Area>, 
+  distance_limit: number, 
+  player: Player, 
+  player_index: number, 
+  onBarriered: (player: Player, moved_to: string) => void
+) {
+  const areas = area.to.filter(v => {
+    const area = adj_list.get(v)!;
+    return area.layer < distance_limit;
+  });
+  const ran = generateRandomNumber(areas.length);
+  moveTo(area, adj_list, player, player_index, ran, distance_limit);
+  onBarriered(player, areas[ran]);
+}
+
+function barrierAllStepHandler(
+  area: Area,
+  adj_list: Map<string, Area>,
+  distance_limit: number,
+  player: Player,
+  player_index: number,
+  onBarriered: (player: Player, moved_to: string) => void
+) {
+  let free: string = ""
+  traverseBFSGraph(
+    area.name, 
+    adj_list, (ahead, curr, area_curr) => {
+      const area_ahead = adj_list.get(ahead)!;
+      if (area_ahead.layer < distance_limit) {
+        free = ahead;
+        return true;
+      }
+    })
+  const free_area = adj_list.get(free)!;
+  free_area.players.push(area.players.splice(player_index, 1)[0]);
+  onBarriered(player, free);
+}
+
 function calculateStayChance(player: Player) {
   player.generateMoveChances();
   const move_chance = player.getMoveChance()
   if (move_chance.chance < move_chance.half) {
     player.hasPlayed = true;
-    return true;    
+    return true;
   }
   return false;
 }
