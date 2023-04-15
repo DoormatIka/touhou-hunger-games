@@ -40,23 +40,6 @@ export function arrayMoveTo(
   }
 }
 
-function barrierOneStepHandler(
-  area: Area, 
-  adj_list: Map<string, Area>, 
-  distance_limit: number, 
-  player: Player, 
-  player_index: number, 
-  onBarriered: (player: Player, moved_to: string) => void
-) {
-  const areas = area.to.filter(v => {
-    const area = adj_list.get(v)!;
-    return area.layer < distance_limit;
-  });
-  const ran = generateRandomNumber(areas.length);
-  moveTo(area, adj_list, player, player_index, ran);
-  onBarriered(player, areas[ran]);
-}
-
 function barrierAllStepHandler(
   area: Area,
   adj_list: Map<string, Area>,
